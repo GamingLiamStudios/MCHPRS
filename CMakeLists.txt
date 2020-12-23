@@ -17,6 +17,15 @@ set(SOURCE_FILES
     # MAIN
     source/main.cpp
 
+    # SERVER
+    source/server.cpp
+
+    # PLAYER
+    source/player.cpp
+
+    # NETWORK
+    source/network/network.cpp
+
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

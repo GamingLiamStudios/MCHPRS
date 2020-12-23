@@ -27,8 +27,8 @@ namespace
 
     struct PlotListEntry
     {
-        int plot_x : i32;
-        int plot_z : i32;
+        int plot_x;
+        int plot_z;
         // TODO: Some sort of inter-thread messaging system
         // priv_message_sender : mpsc::Sender<PrivMessage>
     };
