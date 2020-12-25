@@ -1,6 +1,6 @@
 include(FetchContent)
 
-# Used for storing Q-Learning data for multiple sessions
+# Might be used for worlds instead of whatever Stack uses
 # Include zlib-ng
 FetchContent_Declare(
         zlib_ng
@@ -16,4 +16,21 @@ if(NOT zlib_ng_POPULATED)
   set(WITH_NATIVE_INSTRUCTIONS ON)
 
   add_subdirectory(${zlib_ng_SOURCE_DIR} ${zlib_ng_BINARY_DIR})
+endif()
+
+# Formatting
+# Include fmt
+FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY  https://github.com/fmtlib/fmt
+    GIT_TAG         7.1.3
+)
+FetchContent_GetProperties(fmt)
+if(NOT fmt_POPULATED)
+    FetchContent_Populate(fmt)
+
+    # Disable tests
+    set(FMT_TEST OFF)
+
+    add_subdirectory(${fmt_SOURCE_DIR} ${fmt_BINARY_DIR})
 endif()

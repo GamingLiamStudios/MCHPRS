@@ -26,6 +26,7 @@ set(SOURCE_FILES
 
     # NETWORK
     source/network/network.cpp
+    source/network/socket.cpp # Stolen from another project due to convienince
 
 )
 
@@ -36,4 +37,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 target_include_directories(${PROJECT_NAME} PUBLIC "extern")
 target_include_directories(${PROJECT_NAME} PUBLIC "source") # to allow paths relative to project root
 
-target_link_libraries(${PROJECT_NAME} PRIVATE zlib Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PRIVATE zlib Threads::Threads fmt)
+IF (WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32)         
+ENDIF()      

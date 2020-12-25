@@ -10,6 +10,7 @@
 #include "packets/serverbound.h"
 #include "util/types.h"
 #include "util/mpsc.h"
+#include "socket.h"
 
 enum class NetworkState
 {
@@ -23,16 +24,29 @@ enum class NetworkState
 class NetworkClient
 {
 private:
-    int                                 stream;    // TCP Stream
+    ClientSocket                        stream;
     mpsc::Receiver<ServerBoundPacket *> packets;
     std::shared_ptr<std::atomic_bool>   compressed;
 
-    void listen(
-      int                               stream,
+    static void listen(
+      ClientSocket &                    stream,
       mpsc::Sender<ServerBoundPacket *> sender,
       std::shared_ptr<std::atomic_bool> compressed);
 
 public:
+    NetworkClient(
+      uint32_t                            id,
+      ClientSocket                        stream,
+      NetworkState                        state,
+      mpsc::Receiver<ServerBoundPacket *> packets,
+      bool                                alive,
+      std::shared_ptr<std::atomic_bool>   compressed,
+      std::optional<std::string>          username,
+      std::optional<u128>                 uuid)
+        : id(std::move(id)), stream(std::move(stream)), state(std::move(state)),
+          packets(std::move(packets)), alive(std::move(alive)), compressed(std::move(compressed)),
+          username(std::move(username)), uuid(std::move(uuid)) {};
+
     std::vector<ServerBoundPacket *> receive_packets();
     void                             set_compressed(bool compressed);
     // void send_packet(PacketEncoder &data); TODO
@@ -53,7 +67,7 @@ class NetworkServer
 private:
     mpsc::Receiver<NetworkClient> client_receiver;
 
-    void listen(std::string bind_address, mpsc::Sender<NetworkClient> sender);
+    static void listen(std::string bind_address, mpsc::Sender<NetworkClient> sender);
 
 public:
     NetworkServer(std::string bind_address);
