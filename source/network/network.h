@@ -8,7 +8,8 @@
 #include <cstdint>
 
 #include "packets/serverbound.h"
-#include "util.h"
+#include "util/types.h"
+#include "util/mpsc.h"
 
 enum class NetworkState
 {
@@ -22,11 +23,14 @@ enum class NetworkState
 class NetworkClient
 {
 private:
-    int stream;    // TCP Stream
-    // mpsc::Receiver<Box<dyn ServerBoundPacket>> packets; TODO
-    std::shared_ptr<std::atomic_bool> compressed;
+    int                                 stream;    // TCP Stream
+    mpsc::Receiver<ServerBoundPacket *> packets;
+    std::shared_ptr<std::atomic_bool>   compressed;
 
-    // void listen(); TODO
+    void listen(
+      int                               stream,
+      mpsc::Sender<ServerBoundPacket *> sender,
+      std::shared_ptr<std::atomic_bool> compressed);
 
 public:
     std::vector<ServerBoundPacket *> receive_packets();
@@ -47,7 +51,9 @@ public:
 class NetworkServer
 {
 private:
-    // mpsc::Receiver<NetworkClient> client_receiver; TODO
+    mpsc::Receiver<NetworkClient> client_receiver;
+
+    void listen(std::string bind_address, mpsc::Sender<NetworkClient> sender);
 
 public:
     NetworkServer(std::string bind_address);

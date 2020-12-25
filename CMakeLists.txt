@@ -13,14 +13,15 @@ option(BUILD_SHARED_LIBS "" off)
 
 add_subdirectory(extern)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 set(SOURCE_FILES
     # MAIN
     source/main.cpp
 
     # SERVER
     source/server.cpp
-
-    # PLAYER
     source/player.cpp
 
     # NETWORK
@@ -35,4 +36,4 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 target_include_directories(${PROJECT_NAME} PUBLIC "extern")
 target_include_directories(${PROJECT_NAME} PUBLIC "source") # to allow paths relative to project root
 
-target_link_libraries(${PROJECT_NAME} PRIVATE zlib)
+target_link_libraries(${PROJECT_NAME} PRIVATE zlib Threads::Threads)
