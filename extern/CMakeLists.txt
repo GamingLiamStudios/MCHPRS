@@ -1,6 +1,7 @@
 include(FetchContent)
 
 # Might be used for worlds instead of whatever Stack uses
+# Oh and also used for Packet Compression
 # Include zlib-ng
 FetchContent_Declare(
         zlib_ng
@@ -33,4 +34,22 @@ if(NOT fmt_POPULATED)
     set(FMT_TEST OFF)
 
     add_subdirectory(${fmt_SOURCE_DIR} ${fmt_BINARY_DIR})
+endif()
+
+# Formatting
+# Include libnbt++
+FetchContent_Declare(
+    libnbt
+    GIT_REPOSITORY  https://github.com/ljfa-ag/libnbtplusplus
+    GIT_TAG         v2.5
+)
+FetchContent_GetProperties(libnbt)
+if(NOT libnbt_POPULATED)
+    FetchContent_Populate(libnbt)
+
+    set(NBT_BUILD_SHARED ON)
+    set(NBT_USE_ZLIB OFF)
+    set(NBT_BUILD_TESTS OFF)
+
+    add_subdirectory(${libnbt_SOURCE_DIR} ${libnbt_BINARY_DIR})
 endif()

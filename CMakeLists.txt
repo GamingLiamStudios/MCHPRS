@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.14)
 project(mchprs)
 
 if(MSVC)
@@ -37,7 +37,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 target_include_directories(${PROJECT_NAME} PUBLIC "extern")
 target_include_directories(${PROJECT_NAME} PUBLIC "source") # to allow paths relative to project root
 
-target_link_libraries(${PROJECT_NAME} PRIVATE zlib Threads::Threads fmt)
+target_link_libraries(${PROJECT_NAME} PRIVATE zlib Threads::Threads fmt nbt++)
 IF (WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32)         
 ENDIF()      
