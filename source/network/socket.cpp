@@ -136,48 +136,24 @@ namespace
     }
 }    // namespace
 
-SocketBase::SocketBase() noexcept : _handle(INVALID_SOCKET)
+SocketBase::SocketBase() noexcept : _handle(new raw_socket_t(INVALID_SOCKET))
 {
 }
 
 SocketBase::~SocketBase()
 {
-    if (is_valid()) { close(); }
-}
-
-SocketBase::SocketBase(SocketBase &&other) noexcept : _handle(other._handle)
-{
-    other._handle = INVALID_SOCKET;
-}
-
-SocketBase &SocketBase::operator=(SocketBase &&other) noexcept
-{
-    if (&other != this)
-    {
-        if (is_valid())
-        {
-            close();
-#ifndef NDEBUG
-            Logger::warn(
-              "SocketBase::operator=(SocketBase&&): had to close a valid socket because of move "
-              "operation");
-#endif
-        }
-
-        _handle       = other._handle;
-        other._handle = INVALID_SOCKET;
-    }
-    return *this;
+    if (is_valid() && _handle.use_count() <= 1) { close(); }
+    _handle.reset();
 }
 
 bool SocketBase::operator==(const SocketBase &other) const noexcept
 {
-    return _handle == other._handle;
+    return *_handle == *other._handle;
 }
 
 bool SocketBase::is_valid() const noexcept
 {
-    return _handle != INVALID_SOCKET;
+    return *_handle != INVALID_SOCKET;
 }
 
 void SocketBase::close() noexcept
@@ -185,18 +161,18 @@ void SocketBase::close() noexcept
 #ifdef PLATFORM_WINDOWS
     // See
     // https://docs.microsoft.com/en-us/troubleshoot/windows/win32/close-non-blocked-socket-memory-leak
-    shutdown(_handle, SD_BOTH);
-    closesocket(_handle);
+    shutdown(*_handle, SD_BOTH);
+    closesocket(*_handle);
 #elif PLATFORM_UNIX 1
     ::close(_handle);
 #endif
 
-    _handle = INVALID_SOCKET;
+    *_handle = INVALID_SOCKET;
 
     std::cout << "Socket closed\n";
 }
 
-SocketBase::SocketBase(raw_socket_t handle) noexcept : _handle(handle)
+SocketBase::SocketBase(raw_socket_t handle) noexcept : _handle(new raw_socket_t(handle))
 {
 }
 
@@ -210,7 +186,7 @@ ClientSocket::ClientSocket() noexcept
 
 int ClientSocket::read_bytes(uint8_t *buf, int buf_len) const
 {
-    int ret = recv(_handle, reinterpret_cast<char *>(buf), buf_len, 0);
+    int ret = recv(*_handle, reinterpret_cast<char *>(buf), buf_len, 0);
     if (ret < 0)    // Error handling
     {
         int err = get_error();
@@ -221,7 +197,7 @@ int ClientSocket::read_bytes(uint8_t *buf, int buf_len) const
 
 int ClientSocket::send_bytes(uint8_t const *buf, int buf_len) const noexcept
 {
-    int result = ::send(_handle, reinterpret_cast<char const *>(buf), buf_len, 0);
+    int result = ::send(*_handle, reinterpret_cast<char const *>(buf), buf_len, 0);
 
     if (result < 0)
     {
@@ -241,12 +217,12 @@ bool ClientSocket::is_localhost() const noexcept
     uint32_t    len = sizeof(rem_addr);
 
 #ifdef PLATFORM_WINDOWS
-    getpeername(_handle, (sockaddr *) &rem_addr, (int *) &len);
-    getsockname(_handle, (sockaddr *) &loc_addr, (int *) &len);
+    getpeername(*_handle, (sockaddr *) &rem_addr, (int *) &len);
+    getsockname(*_handle, (sockaddr *) &loc_addr, (int *) &len);
     return (rem_addr.sin_addr.S_un.S_addr == loc_addr.sin_addr.S_un.S_addr);
 #elif PLATFORM_UNIX 1
-    getpeername(_handle, (sockaddr *) &rem_addr, &len);
-    getsockname(_handle, (sockaddr *) &loc_addr, &len);
+    getpeername(*_handle, (sockaddr *) &rem_addr, &len);
+    getsockname(*_handle, (sockaddr *) &loc_addr, &len);
     return (rem_addr.sin_addr.s_addr == loc_addr.sin_addr.s_addr);
 #endif
 }
@@ -316,7 +292,7 @@ ClientSocket ServerSocket::accept_connection() const noexcept
 
 #ifdef PLATFORM_WINDOWS
     raw_socket_t new_handle = ::accept(
-      _handle,
+      *_handle,
       reinterpret_cast<sockaddr *>(&client),
       reinterpret_cast<int *>(&client_size));
 #elif PLATFORM_UNIX 1

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 #if defined(_WIN32)
 #define PLATFORM_WINDOWS
@@ -34,7 +35,7 @@ public:
 protected:
     explicit SocketBase(raw_socket_t handle) noexcept;
 
-    raw_socket_t _handle;
+    std::shared_ptr<raw_socket_t> _handle;
 };
 
 class ClientSocket final : public SocketBase
