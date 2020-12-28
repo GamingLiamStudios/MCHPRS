@@ -189,7 +189,7 @@ ClientSocket::ClientSocket() noexcept
 
 i32 ClientSocket::read_bytes(u8 *buf, i32 buf_len) const
 {
-    i32 ret = recv(*_handle, reinterpret_cast<i8 *>(buf), buf_len, 0);
+    i32 ret = recv(*_handle, reinterpret_cast<char *>(buf), buf_len, 0);
     if (ret < 0)    // Error handling
     {
         i32 err = get_error();
@@ -200,7 +200,7 @@ i32 ClientSocket::read_bytes(u8 *buf, i32 buf_len) const
 
 i32 ClientSocket::send_bytes(u8 const *buf, i32 buf_len) const noexcept
 {
-    i32 result = ::send(*_handle, reinterpret_cast<i8 const *>(buf), buf_len, 0);
+    i32 result = ::send(*_handle, reinterpret_cast<char const *>(buf), buf_len, 0);
 
     if (result < 0)
     {
@@ -270,7 +270,7 @@ ServerSocket ServerSocket::listen_on_port(u16 port)
     }
 
     i32 flag   = 1;
-    i32 result = setsockopt(handle, IPPROTO_TCP, TCP_NODELAY, (i8 *) &flag, sizeof(flag));
+    i32 result = setsockopt(handle, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(flag));
     if (result < 0)
     {
         std::cout << "Could not disable nagle's algorithm! Error: \n" << get_error_string() << "\n";

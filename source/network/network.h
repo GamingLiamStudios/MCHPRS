@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 #include <atomic>
-#include <cstdint>
+#include "util/types.h"
 
 #include "packets/serverbound.h"
 #include "util/types.h"

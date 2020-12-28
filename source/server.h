@@ -2,9 +2,14 @@
 
 #include <string>
 #include <optional>
+#include <vector>
+#include <hash_map>
 
-#include "util.h"
 #include "player.h"
+#include "network/network.h"
+
+#include "util/types.h"
+#include "util/mpsc.h"
 
 namespace
 {
@@ -29,20 +34,19 @@ namespace
     {
         i32 plot_x;
         i32 plot_z;
-        // TODO: Some sort of inter-thread messaging system
-        // priv_message_sender : mpsc::Sender<PrivMessage>
+        // mpsc::Sender<PrivMessage> priv_message_sender; // TODO
     };
 
 }    // namespace
 
-/* TODO: Some Networking stuff
 struct MinecraftServer
 {
-    network: NetworkServer,
+    NetworkServer network;
+    /* TODO
     broadcaster: Bus<BroadcastMessage>,
     receiver: Receiver<Message>,
     plot_sender: Sender<Message>,
-    online_players: HashMap<u128, PlayerListEntry>,
-    running_plots: Vec<PlotListEntry>,
+    */
+    std::unordered_map<u128, PlayerListEntry> online_players;
+    std::vector<PlotListEntry>                running_plots;
 };
-*/

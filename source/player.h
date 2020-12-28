@@ -1,10 +1,9 @@
 #pragma once
 
-#include <cstdint>
 #include <optional>
 #include <vector>
 
-#include "util.h"
+#include "util/types.h"
 
 enum class Gamemode
 {
@@ -33,4 +32,4 @@ struct PlayerData
     float                       fly_speed;
     float                       walk_speed;
     Gamemode                    gamemode;
-}
+};

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <memory>
+#include "util/types.h"
 
 #if defined(_WIN32)
 #define PLATFORM_WINDOWS

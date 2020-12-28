@@ -1,6 +1,6 @@
 #include <iostream>
 
-i32 main()
+int main()
 {
     std::cout << "Hello World!\n";
 }
