@@ -64,7 +64,7 @@ void NetworkServer::listen(std::string bind_address, mpsc::Sender<NetworkClient>
 
         if (sender.expired()) break;
         sender.lock().get()->enqueue(NetworkClient(
-          (uint32_t) total_connections,
+          (u32) total_connections,
           std::move(stream),
           NetworkState::Handshake,
           std::move(packet_receiver),

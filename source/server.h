@@ -17,8 +17,8 @@ namespace
 
     struct PlayerListEntry
     {
-        int                        plot_x;
-        int                        plot_z;
+        i32                        plot_x;
+        i32                        plot_z;
         std::string                username;
         u128                       uuid;
         Gamemode                   gamemode;
@@ -27,8 +27,8 @@ namespace
 
     struct PlotListEntry
     {
-        int plot_x;
-        int plot_z;
+        i32 plot_x;
+        i32 plot_z;
         // TODO: Some sort of inter-thread messaging system
         // priv_message_sender : mpsc::Sender<PrivMessage>
     };

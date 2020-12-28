@@ -14,11 +14,11 @@ enum class Gamemode
 
 struct InventoryEntry
 {
-    uint32_t                            id;
-    char                                slot;
-    char                                count;
-    short                               damage;
-    std::optional<std::vector<uint8_t>> nbt;
+    u32                            id;
+    i8                             slot;
+    i8                             count;
+    i16                            damage;
+    std::optional<std::vector<u8>> nbt;
 };
 
 struct PlayerData
@@ -29,7 +29,7 @@ struct PlayerData
     f64x3                       position;
     f32x2                       rotation;
     std::vector<InventoryEntry> inventory;
-    int                         selected_item_slot;
+    i32                         selected_item_slot;
     float                       fly_speed;
     float                       walk_speed;
     Gamemode                    gamemode;

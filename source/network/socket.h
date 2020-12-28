@@ -5,18 +5,18 @@
 
 #if defined(_WIN32)
 #define PLATFORM_WINDOWS
-using raw_socket_t = uint64_t;
+using raw_socket_t = u64;
 #elif defined(unix) || defined(__unix__) || defined(__unix) || \
   (defined(__APPLE__) && defined(__MACH__))
 #define PLATFORM_UNIX
-using raw_socket_t = int;
+using raw_socket_t = i32;
 #else
 #error "Unknown platform"
 #endif
 
-inline constexpr int SOCK_ERROR       = -2;
-inline constexpr int SOCK_NO_DATA     = -1;
-inline constexpr int SOCK_CONN_CLOSED = 0;
+inline constexpr i32 SOCK_ERROR       = -2;
+inline constexpr i32 SOCK_NO_DATA     = -1;
+inline constexpr i32 SOCK_CONN_CLOSED = 0;
 
 // RAII abstraction over platform-dependent socket stuff
 class SocketBase
@@ -50,9 +50,9 @@ public:
     //    -1 if there's no data,
     //     0 if connection closed and
     //     the number of bytes read otherwise
-    int read_bytes(uint8_t *buf, int buf_len) const;
+    i32 read_bytes(u8 *buf, i32 buf_len) const;
 
-    int send_bytes(uint8_t const *buf, int buf_len) const noexcept;
+    i32 send_bytes(u8 const *buf, i32 buf_len) const noexcept;
 
     bool is_localhost() const noexcept;
 
@@ -65,7 +65,7 @@ private:
 class ServerSocket final : public SocketBase
 {
 public:
-    static ServerSocket listen_on_port(uint16_t port);
+    static ServerSocket listen_on_port(u16 port);
 
     [[nodiscard]] ClientSocket accept_connection() const noexcept;
 

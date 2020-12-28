@@ -35,7 +35,7 @@ private:
 
 public:
     NetworkClient(
-      uint32_t                            id,
+      u32                                 id,
       ClientSocket                        stream,
       NetworkState                        state,
       mpsc::Receiver<ServerBoundPacket *> packets,
@@ -54,7 +54,7 @@ public:
 
     // All NetworkClients are identified by this id.
     // If the client is a player, the player's entitiy id becomes the same.
-    uint32_t                   id;
+    u32                        id;
     NetworkState               state;
     bool                       alive;
     std::optional<std::string> username;

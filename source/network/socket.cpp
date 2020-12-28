@@ -103,7 +103,7 @@ namespace
             WSADATA wsData;
             WORD    ver = MAKEWORD(2, 2);
 
-            int ws0k = WSAStartup(ver, &wsData);
+            i32 ws0k = WSAStartup(ver, &wsData);
 
             if (ws0k != 0) std::__throw_runtime_error("Cannot init winsock");
             g_winsock_initialized = true;
@@ -113,7 +113,7 @@ namespace
         return socket(AF_INET, SOCK_STREAM, 0);
     }
 
-    std::string get_error_string(int errcode = get_error())
+    std::string get_error_string(i32 errcode = get_error())
     {
 #ifdef PLATFORM_WINDOWS
         std::string msg(256, '\0');
@@ -187,24 +187,24 @@ ClientSocket::ClientSocket() noexcept
 {
 }
 
-int ClientSocket::read_bytes(uint8_t *buf, int buf_len) const
+i32 ClientSocket::read_bytes(u8 *buf, i32 buf_len) const
 {
-    int ret = recv(*_handle, reinterpret_cast<char *>(buf), buf_len, 0);
+    i32 ret = recv(*_handle, reinterpret_cast<i8 *>(buf), buf_len, 0);
     if (ret < 0)    // Error handling
     {
-        int err = get_error();
+        i32 err = get_error();
         return SOCK_NO_DATA;
     }
     return ret;
 }
 
-int ClientSocket::send_bytes(uint8_t const *buf, int buf_len) const noexcept
+i32 ClientSocket::send_bytes(u8 const *buf, i32 buf_len) const noexcept
 {
-    int result = ::send(*_handle, reinterpret_cast<char const *>(buf), buf_len, 0);
+    i32 result = ::send(*_handle, reinterpret_cast<i8 const *>(buf), buf_len, 0);
 
     if (result < 0)
     {
-        int err = get_error();
+        i32 err = get_error();
         std::cout << fmt::format(
           "Error occurred while sending bytes to client: \n{}: {}",
           err,
@@ -217,11 +217,11 @@ int ClientSocket::send_bytes(uint8_t const *buf, int buf_len) const noexcept
 bool ClientSocket::is_localhost() const noexcept
 {
     sockaddr_in rem_addr {}, loc_addr {};
-    uint32_t    len = sizeof(rem_addr);
+    u32         len = sizeof(rem_addr);
 
 #ifdef PLATFORM_WINDOWS
-    getpeername(*_handle, (sockaddr *) &rem_addr, (int *) &len);
-    getsockname(*_handle, (sockaddr *) &loc_addr, (int *) &len);
+    getpeername(*_handle, (sockaddr *) &rem_addr, (i32 *) &len);
+    getsockname(*_handle, (sockaddr *) &loc_addr, (i32 *) &len);
     return (rem_addr.sin_addr.S_un.S_addr == loc_addr.sin_addr.S_un.S_addr);
 #elif PLATFORM_UNIX 1
     getpeername(*_handle, (sockaddr *) &rem_addr, &len);
@@ -243,7 +243,7 @@ ClientSocket::ClientSocket(raw_socket_t handle) noexcept : SocketBase(handle)
 // SERVER SOCKET
 //
 
-ServerSocket ServerSocket::listen_on_port(uint16_t port)
+ServerSocket ServerSocket::listen_on_port(u16 port)
 {
     // 1. Create socket
     raw_socket_t handle = new_socket();
@@ -269,8 +269,8 @@ ServerSocket ServerSocket::listen_on_port(uint16_t port)
         return ServerSocket::invalid();
     }
 
-    int flag   = 1;
-    int result = setsockopt(handle, IPPROTO_TCP, TCP_NODELAY, (char *) &flag, sizeof(flag));
+    i32 flag   = 1;
+    i32 result = setsockopt(handle, IPPROTO_TCP, TCP_NODELAY, (i8 *) &flag, sizeof(flag));
     if (result < 0)
     {
         std::cout << "Could not disable nagle's algorithm! Error: \n" << get_error_string() << "\n";
@@ -291,13 +291,13 @@ ServerSocket ServerSocket::listen_on_port(uint16_t port)
 ClientSocket ServerSocket::accept_connection() const noexcept
 {
     sockaddr_in client {};
-    uint32_t    client_size = sizeof(client);
+    u32         client_size = sizeof(client);
 
 #ifdef PLATFORM_WINDOWS
     raw_socket_t new_handle = ::accept(
       *_handle,
       reinterpret_cast<sockaddr *>(&client),
-      reinterpret_cast<int *>(&client_size));
+      reinterpret_cast<i32 *>(&client_size));
 #elif PLATFORM_UNIX 1
     raw_socket_t new_handle =
       ::accept(_handle, reinterpret_cast<sockaddr *>(&client), &client_size);
