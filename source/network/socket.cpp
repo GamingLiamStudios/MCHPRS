@@ -142,8 +142,11 @@ SocketBase::SocketBase() noexcept : _handle(new raw_socket_t(INVALID_SOCKET))
 
 SocketBase::~SocketBase()
 {
-    if (is_valid() && _handle.use_count() <= 1) { close(); }
-    _handle.reset();
+    if (_handle.use_count() <= 1)
+    {
+        if (is_valid()) { close(); }
+        _handle.reset();
+    }
 }
 
 bool SocketBase::operator==(const SocketBase &other) const noexcept
